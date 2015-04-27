@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.net.URLConnection;
 import java.util.Observable;
+import java.util.TimerTask;
 
 /**
  * Created by cxj8923 on 4/26/15.
@@ -8,22 +9,45 @@ import java.util.Observable;
 public class UrlMonitor extends Observable implements Serializable{
 
     private URLConnection connect;
+    private long urlSize;
+    private long lastUpdate;
 
     public UrlMonitor(URLConnection aConnection)
     {
         connect = aConnection;
+
     }
 
-    public void addMailListener()
+    public long getUrlSize()
     {
-        UrlChangeMailer mailer = new UrlChangeMailer();
-        this.addObserver(mailer);
+        return urlSize;
     }
 
-    public void addTranscriptListener()
+    public long getLastUpdate()
     {
-        UrlChangeTranscript transcript = new UrlChangeTranscript();
-        this.addObserver(transcript);
+        return lastUpdate;
+    }
+
+    public String url()
+    {
+        return  connect.toString();
+    }
+    private class UrlCheck extends TimerTask
+    {
+
+        @Override
+        public void run()
+        {
+            long lastModified = connect.getLastModified();
+            long currentSize = connect.getContentLength();
+            if(lastUpdate != lastModified || urlSize != currentSize)
+            {
+                urlSize = currentSize;
+                lastUpdate = lastModified;
+                UrlMonitor.this.setChanged();
+                UrlMonitor.this.notifyObservers();
+            }
+        }
     }
 
 }
