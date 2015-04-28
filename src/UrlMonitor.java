@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.net.URLConnection;
 import java.util.Observable;
+import java.util.Timer;
 import java.util.TimerTask;
 
 /**
@@ -15,7 +16,8 @@ public class UrlMonitor extends Observable implements Serializable{
     public UrlMonitor(URLConnection aConnection)
     {
         connect = aConnection;
-
+        Timer timer = new Timer();
+        timer.schedule(new UrlCheck(), 10000, 10000);
     }
 
     public long getUrlSize()
