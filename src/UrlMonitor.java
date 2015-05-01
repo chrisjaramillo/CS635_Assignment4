@@ -1,21 +1,19 @@
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Observable;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * Created by cxj8923 on 4/26/15.
  */
-public class UrlMonitor extends Observable implements Serializable{
+public class UrlMonitor implements Monitor, Serializable{
 
     private String url;
     private long urlSize;
     private long lastUpdate;
     private transient URLConnection connect;
+    private transient List<Notifier> notifiers;
 
     public UrlMonitor(String aUrl) throws IOException
     {
@@ -23,6 +21,7 @@ public class UrlMonitor extends Observable implements Serializable{
         lastUpdate = 0;
         url = aUrl;
         connect = getConnection(url);
+        notifiers = new ArrayList<Notifier>();
         Timer timer = new Timer();
         timer.schedule(new UrlCheck(), 10000, 10000);
     }
@@ -42,9 +41,22 @@ public class UrlMonitor extends Observable implements Serializable{
         return  connect.getURL().toString();
     }
 
+    @Override
+    public void addNotifier(Notifier aNotifier)
+    {
+        notifiers.add(aNotifier);
+    }
+
+    public void updateClients()
+    {
+        for(Notifier aNotifier : notifiers)
+        {
+            aNotifier.update(this);
+        }
+    }
+
     private class UrlCheck extends TimerTask
     {
-
         @Override
         public void run()
         {
@@ -55,8 +67,7 @@ public class UrlMonitor extends Observable implements Serializable{
             {
                 urlSize = currentSize;
                 lastUpdate = lastModified;
-                UrlMonitor.this.setChanged();
-                UrlMonitor.this.notifyObservers();
+                UrlMonitor.this.updateClients();
             }
         }
     }
@@ -66,5 +77,4 @@ public class UrlMonitor extends Observable implements Serializable{
         URL address = new URL(url);
         return  address.openConnection();
     }
-
 }

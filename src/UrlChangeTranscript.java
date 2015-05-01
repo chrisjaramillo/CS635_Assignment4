@@ -6,17 +6,17 @@ import java.util.Observer;
 /**
  * Created by cxj8923 on 4/26/15.
  */
-public class UrlChangeTranscript implements Observer, Serializable {
+public class UrlChangeTranscript implements Notifier, Serializable {
     private long updatedTime;
     private long updatedSize;
 
     @Override
-    public void update(Observable o, Object arg)
+    public void update(Monitor aMonitor)
     {
         StringBuffer updateMessage = new StringBuffer();
-        updateMessage.append(((UrlMonitor)o).url()).append(" updated:");
-        long newTime = ((UrlMonitor)o).getLastUpdate();
-        long newSize = ((UrlMonitor)o).getUrlSize();
+        updateMessage.append(((UrlMonitor)aMonitor).url()).append(" updated:");
+        long newTime = ((UrlMonitor)aMonitor).getLastUpdate();
+        long newSize = ((UrlMonitor)aMonitor).getUrlSize();
         if(updatedTime != newTime)
         {
             updatedTime = newTime;

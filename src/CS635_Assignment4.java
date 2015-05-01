@@ -13,13 +13,13 @@ import java.util.Properties;
 
 public class CS635_Assignment4 {
 
-    public static void main(String[] args) throws IOException {
-
-        UrlMonitor mon = new UrlMonitor("http://eli.sdsu.edu/");
-        mon.addObserver(new UrlChangeTranscript());
+    public static void main(String[] args) throws IOException
+    {
         Properties props = new Properties();
         SMTPAuthenticator auth = new SMTPAuthenticator();
         Session session = Session.getDefaultInstance(props, auth);
+        UrlMonitor mon = new UrlMonitor("http://eli.sdsu.edu/");
+        mon.addNotifier(new UrlChangeTranscript());
     }
 
 

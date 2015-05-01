@@ -1,3 +1,4 @@
+import javax.mail.Session;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Observable;
@@ -6,18 +7,33 @@ import java.util.Observer;
 /**
  * Created by cxj8923 on 4/26/15.
  */
-public class UrlChangeMailer implements Observer, Serializable
+public class UrlChangeMailer implements Notifier, Serializable
 {
     private long updatedTime;
     private long updatedSize;
+    private String username;
+    private String password;
+    private String server;
+    private String port;
+    private transient Session mailSession;
+
+    UrlChangeMailer()
+    {
+        mailSession = getSession();
+    }
+
+    private Session getSession()
+    {
+        return null;
+    }
 
     @Override
-    public void update(Observable o, Object arg)
+    public void update(Monitor aMonitor)
     {
         StringBuffer updateMessage = new StringBuffer();
-        updateMessage.append(((UrlMonitor)o).url()).append(" updated:");
-        long newTime = ((UrlMonitor)o).getLastUpdate();
-        long newSize = ((UrlMonitor)o).getUrlSize();
+        updateMessage.append(((UrlMonitor)aMonitor).url()).append(" updated:");
+        long newTime = ((UrlMonitor)aMonitor).getLastUpdate();
+        long newSize = ((UrlMonitor)aMonitor).getUrlSize();
         if(updatedTime != newTime)
         {
             updatedTime = newTime;
@@ -28,6 +44,5 @@ public class UrlChangeMailer implements Observer, Serializable
             updatedSize = newSize;
             updateMessage.append(" content size is now ").append(newSize);
         }
-
     }
 }
