@@ -1,4 +1,7 @@
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.Observable;
 import java.util.Timer;
@@ -9,13 +12,17 @@ import java.util.TimerTask;
  */
 public class UrlMonitor extends Observable implements Serializable{
 
-    private URLConnection connect;
+    private String url;
     private long urlSize;
     private long lastUpdate;
+    private transient URLConnection connect;
 
-    public UrlMonitor(URLConnection aConnection)
+    public UrlMonitor(String aUrl) throws IOException
     {
-        connect = aConnection;
+        urlSize = 0;
+        lastUpdate = 0;
+        url = aUrl;
+        connect = getConnection(url);
         Timer timer = new Timer();
         timer.schedule(new UrlCheck(), 10000, 10000);
     }
@@ -32,14 +39,16 @@ public class UrlMonitor extends Observable implements Serializable{
 
     public String url()
     {
-        return  connect.toString();
+        return  connect.getURL().toString();
     }
+
     private class UrlCheck extends TimerTask
     {
 
         @Override
         public void run()
         {
+            System.out.println("Checking...");
             long lastModified = connect.getLastModified();
             long currentSize = connect.getContentLength();
             if(lastUpdate != lastModified || urlSize != currentSize)
@@ -50,6 +59,12 @@ public class UrlMonitor extends Observable implements Serializable{
                 UrlMonitor.this.notifyObservers();
             }
         }
+    }
+
+    private URLConnection getConnection(String url) throws IOException
+    {
+        URL address = new URL(url);
+        return  address.openConnection();
     }
 
 }

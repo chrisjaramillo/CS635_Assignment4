@@ -3,10 +3,32 @@
  */
 
 import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Properties;
+
 public class CS635_Assignment4 {
 
-    public static void main(String[] args, int argc)
-    {
+    public static void main(String[] args) throws IOException {
 
+        UrlMonitor mon = new UrlMonitor("http://eli.sdsu.edu/");
+        mon.addObserver(new UrlChangeTranscript());
+        Properties props = new Properties();
+        SMTPAuthenticator auth = new SMTPAuthenticator();
+        Session session = Session.getDefaultInstance(props, auth);
+    }
+
+
+}
+
+class SMTPAuthenticator extends javax.mail.Authenticator {
+    public PasswordAuthentication getPasswordAuthentication() {
+        String username = "chris";
+        String password = "chris";
+        return new PasswordAuthentication(username, password);
     }
 }
