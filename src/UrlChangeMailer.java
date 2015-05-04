@@ -1,4 +1,7 @@
 import javax.mail.Session;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Observable;
@@ -17,32 +20,36 @@ public class UrlChangeMailer implements Notifier, Serializable
     private String port;
     private transient Session mailSession;
 
-    UrlChangeMailer()
-    {
+    UrlChangeMailer() throws IOException {
         mailSession = getSession();
     }
 
-    private Session getSession()
-    {
+    private Session getSession() throws IOException {
+        System.out.print("Username:");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        username = br.readLine();
+        System.out.print("Password:");
+        br = new BufferedReader(new InputStreamReader(System.in));
+        password = br.readLine();
+        System.out.print("Server:");
+        br = new BufferedReader(new InputStreamReader(System.in));
+        server = br.readLine();
+        System.out.print("Port:");
+        br = new BufferedReader(new InputStreamReader(System.in));
+        port = br.readLine();
+
         return null;
     }
 
     @Override
     public void update(Monitor aMonitor)
     {
-        StringBuffer updateMessage = new StringBuffer();
-        updateMessage.append(((UrlMonitor)aMonitor).url()).append(" updated:");
-        long newTime = ((UrlMonitor)aMonitor).getLastUpdate();
-        long newSize = ((UrlMonitor)aMonitor).getUrlSize();
-        if(updatedTime != newTime)
-        {
-            updatedTime = newTime;
-            Date modifiedDate = new Date(newTime);
-            updateMessage.append(" at time ").append(modifiedDate.toString());
-        }
-        if(updatedSize != newSize) {
-            updatedSize = newSize;
-            updateMessage.append(" content size is now ").append(newSize);
-        }
+        sendEmail();
+    }
+
+    private void sendEmail()
+    {
+        System.out.println("If I could I would email you");
+
     }
 }

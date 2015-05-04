@@ -15,19 +15,18 @@ public class UrlChangeTranscript implements Notifier, Serializable {
     {
         StringBuffer updateMessage = new StringBuffer();
         updateMessage.append(((UrlMonitor)aMonitor).url()).append(" updated:");
-        long newTime = ((UrlMonitor)aMonitor).getLastUpdate();
-        long newSize = ((UrlMonitor)aMonitor).getUrlSize();
-        if(updatedTime != newTime)
-        {
-            updatedTime = newTime;
-            Date modifiedDate = new Date(newTime);
-            updateMessage.append(" at time ").append(modifiedDate.toString());
-        }
-        if(updatedSize != newSize)
-        {
-            updatedSize = newSize;
-            updateMessage.append(" content size is now ").append(newSize);
-        }
-        System.out.println(updateMessage.toString());
+        updatedTime = ((UrlMonitor)aMonitor).getLastUpdate();
+        updatedSize = ((UrlMonitor)aMonitor).getUrlSize();
+        System.out.println(((UrlMonitor) aMonitor).url() + this);
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuffer output = new StringBuffer();
+        Date modified = new Date(updatedTime);
+        output.append(" Last updated at time: ").append(modified.toString());
+        output.append(" size: ").append(updatedSize);
+        return  output.toString();
     }
 }

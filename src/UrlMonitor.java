@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -12,18 +11,22 @@ public class UrlMonitor implements Monitor, Serializable{
     private String url;
     private long urlSize;
     private long lastUpdate;
-    private transient URLConnection connect;
-    private transient List<Notifier> notifiers;
+    private List<Notifier> notifiers;
+    protected transient URLConnection connect;
 
     public UrlMonitor(String aUrl) throws IOException
     {
+        url = aUrl;
         urlSize = 0;
         lastUpdate = 0;
-        url = aUrl;
-        connect = getConnection(url);
         notifiers = new ArrayList<Notifier>();
+    }
+
+    public void run() throws IOException {
+        connect = getConnection(url);
+        System.out.println("Last Update: " + lastUpdate + " size: " + urlSize);
         Timer timer = new Timer();
-        timer.schedule(new UrlCheck(), 10000, 10000);
+        timer.schedule(new UrlCheck(), 10000, 100000);
     }
 
     public long getUrlSize()
@@ -55,20 +58,35 @@ public class UrlMonitor implements Monitor, Serializable{
         }
     }
 
+    public void checkUrl()
+    {
+        long lastModified = connect.getLastModified();
+        long currentSize = connect.getContentLength();
+        if(lastUpdate != lastModified || urlSize != currentSize)
+        {
+            urlSize = currentSize;
+            lastUpdate = lastModified;
+            updateClients();
+            try {
+                FileOutputStream out = new FileOutputStream("monitor.ser", false);
+                ObjectOutputStream oOut = new ObjectOutputStream(out);
+                oOut.writeObject(this);
+                oOut.close();
+                out.close();
+            }
+            catch (IOException e)
+            {
+                System.out.println("IO Exception " + e.toString());
+            }
+        }
+    }
+
     private class UrlCheck extends TimerTask
     {
         @Override
         public void run()
         {
-            System.out.println("Checking...");
-            long lastModified = connect.getLastModified();
-            long currentSize = connect.getContentLength();
-            if(lastUpdate != lastModified || urlSize != currentSize)
-            {
-                urlSize = currentSize;
-                lastUpdate = lastModified;
-                UrlMonitor.this.updateClients();
-            }
+           UrlMonitor.this.checkUrl();
         }
     }
 
