@@ -16,10 +16,9 @@ public class MockUrlMonitor extends UrlMonitor {
     public MockUrlMonitor(String aUrl) throws IOException
     {
         super(aUrl);
-        connect = getConnection(aUrl);
     }
 
-    private URLConnection getConnection(String url) throws IOException
+    protected URLConnection getConnection(String url) throws IOException
     {
         URLConnection connection = mock(URLConnection.class);
         when(connection.getLastModified()).thenReturn((long)2);

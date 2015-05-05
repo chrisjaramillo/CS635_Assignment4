@@ -20,10 +20,11 @@ public class UrlMonitor implements Monitor, Serializable{
         urlSize = 0;
         lastUpdate = 0;
         notifiers = new ArrayList<Notifier>();
+        connect = getConnection(url);
     }
 
     public void run() throws IOException {
-        connect = getConnection(url);
+
         System.out.println("Last Update: " + lastUpdate + " size: " + urlSize);
         Timer timer = new Timer();
         timer.schedule(new UrlCheck(), 10000, 100000);
@@ -90,7 +91,7 @@ public class UrlMonitor implements Monitor, Serializable{
         }
     }
 
-    private URLConnection getConnection(String url) throws IOException
+    protected URLConnection getConnection(String url) throws IOException
     {
         URL address = new URL(url);
         return  address.openConnection();

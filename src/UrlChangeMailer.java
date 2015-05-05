@@ -1,4 +1,6 @@
-import javax.mail.Session;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Properties;
 
 /**
  * Created by cxj8923 on 4/26/15.
@@ -49,7 +52,35 @@ public class UrlChangeMailer implements Notifier, Serializable
 
     private void sendEmail()
     {
-        System.out.println("If I could I would email you");
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", this.server);
+        props.put("mail.smtp.port", this.port);
 
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+
+        try {
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("chris.jaramillo@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse("cjaramillo@transcendinsights.com"));
+            message.setSubject("Testing Subject");
+            message.setText("Dear Mail Crawler,"
+                    + "\n\n No spam to my email, please!");
+
+            Transport.send(message);
+
+            System.out.println("Done");
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
