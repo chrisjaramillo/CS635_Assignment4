@@ -47,10 +47,27 @@ public class UrlChangeMailer implements Notifier, Serializable
     @Override
     public void update(Monitor aMonitor)
     {
-        sendEmail();
+        updatedTime = ((UrlMonitor)aMonitor).getLastUpdate();
+        updatedSize = ((UrlMonitor)aMonitor).getUrlSize();
+        sendEmail(((UrlMonitor)aMonitor).url());
     }
 
-    private void sendEmail()
+    public String subject(String url)
+    {
+        Date time = new Date();
+        return url + " updated " + time.toString();
+    }
+
+    public String text()
+    {
+        Date time = new Date(updatedTime);
+        StringBuffer updateText = new StringBuffer();
+        updateText.append("Most recent update time: " + time.toString());
+        updateText.append("\nMost reccent size: " + updatedSize);
+        return updateText.toString();
+    }
+
+    private void sendEmail(String url)
     {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -68,12 +85,11 @@ public class UrlChangeMailer implements Notifier, Serializable
         try {
 
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("chris.jaramillo@gmail.com"));
+            message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse("cjaramillo@transcendinsights.com"));
-            message.setSubject("Testing Subject");
-            message.setText("Dear Mail Crawler,"
-                    + "\n\n No spam to my email, please!");
+            message.setSubject(subject(url));
+            message.setText(text());
 
             Transport.send(message);
 
