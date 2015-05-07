@@ -23,7 +23,8 @@ public class UrlMonitor implements Monitor, Serializable{
         connect = getConnection(url);
     }
 
-    public void run() throws IOException {
+    public void run() throws IOException
+    {
 
         System.out.println("Last Update: " + lastUpdate + " size: " + urlSize);
         Timer timer = new Timer();
@@ -69,10 +70,11 @@ public class UrlMonitor implements Monitor, Serializable{
             lastUpdate = lastModified;
             updateClients();
             try {
-                FileOutputStream out = new FileOutputStream("monitor.ser", false);
-                ObjectOutputStream oOut = new ObjectOutputStream(out);
-                oOut.writeObject(this);
-                oOut.close();
+                String mementoFilename = url.replace("/", "") + ".ser";
+                FileOutputStream out = new FileOutputStream(mementoFilename, false);
+                ObjectOutputStream objectOut = new ObjectOutputStream(out);
+                objectOut.writeObject(this);
+                objectOut.close();
                 out.close();
             }
             catch (IOException e)

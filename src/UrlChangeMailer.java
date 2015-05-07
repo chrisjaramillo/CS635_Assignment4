@@ -21,13 +21,12 @@ public class UrlChangeMailer implements Notifier, Serializable
     private String password;
     private String server;
     private String port;
-    private transient Session mailSession;
 
     UrlChangeMailer() throws IOException {
-        mailSession = getSession();
+        setupSession();
     }
 
-    private Session getSession() throws IOException {
+    protected void setupSession() throws IOException {
         System.out.print("Username:");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         username = br.readLine();
@@ -40,8 +39,6 @@ public class UrlChangeMailer implements Notifier, Serializable
         System.out.print("Port:");
         br = new BufferedReader(new InputStreamReader(System.in));
         port = br.readLine();
-
-        return null;
     }
 
     @Override
@@ -67,7 +64,7 @@ public class UrlChangeMailer implements Notifier, Serializable
         return updateText.toString();
     }
 
-    private void sendEmail(String url)
+    protected void sendEmail(String url)
     {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

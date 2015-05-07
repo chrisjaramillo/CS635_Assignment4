@@ -1,6 +1,8 @@
 //import org.junit.Assert;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by Christopher on 5/3/2015.
@@ -20,14 +22,12 @@ public class UrlMonitorTest {
     }
 
     @org.junit.Test
-    public void testAddNotifier() throws Exception
-    {
-
-    }
-
-    @org.junit.Test
     public void testUpdateClients() throws Exception
     {
-
+        UrlMonitor testMonitor = new MockUrlMonitor("http://www.myTestWeb.com");
+        Notifier mockNotifier = mock(Notifier.class);
+        testMonitor.addNotifier(mockNotifier);
+        testMonitor.updateClients();
+        verify(mockNotifier).update(testMonitor);
     }
 }
